@@ -1,0 +1,79 @@
+<!DOCKTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>滴答定时器概述</title>
+        <style>
+            h2{
+                text-shadow: 1px 1px rgb(148, 150, 151);
+                color: rgb(4, 4, 4);
+                text-align: center;
+            }
+            .h3{
+                text-shadow: 1px 1px rgb(92, 92, 92);
+                text-align: left;
+            }
+
+            
+            p{
+                color: aliceblue;
+                text-align: left;
+                text-indent: 30px;
+            }
+            div{
+                box-shadow: -10px -20px rgb(59, 161, 72);
+                text-align: center;
+                position: relative;
+                border-radius: 25px;
+                padding: 80px;
+                margin-left: 20%;
+                margin-right: 20%;
+                margin-top: 40px;
+                background-image:linear-gradient(to right,red,blue);
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+        <h2>滴答定时器概述</h2>
+            <h3 class="h3">1. 概述</h3>
+                <p> 滴答定时器(SYS_Tick)是Cortext-M内核的一个简单定时器。
+                    滴答定时器是一个24位的递减计数器，
+                    主要用于为嵌入式系统提供基本的定时功能，
+                    也为实时操作系统RTOS提供系统节拍。
+                </p>
+            <h3 class="h3">2. 时钟源</h3>
+                <p> 滴答定时器有两个可选的时钟源，
+                    一个是处理器内核时钟： HCLK（来源AHB总线），
+                    另一个是外部参考时钟。
+                    对于F1/F3/F7， 滴答定时器来源于HCLK，
+                    对于H7系列，系统滴答定时器来自于 sys_d1cpre_ck 。
+                    当定时器启动后，它会从设定的初始值开始递减计数。
+                    每经过一个时钟周期，计数器值减1.当计数器减到0，延时完成，COUNTFLAG置1、
+                    产生一个中断请求，并且可以根据设置重新加载LOAD初始值。
+                </p>
+            
+            
+            <h3 class="h3">3. 寄存器</h3>
+                <h4 class="h3">（1）控制与状态寄存器 STK_CTRL</h4>
+                    <p> 该寄存器用于控制滴答定时器的主要功能。其中包含了启动 / 停止定时器的位（ENABLE 位），如果将此位置 1，则启动定时器；若置 0，则停止定时器。
+                        还有用于控制中断使能的位（TICKINT 位），当这个位置 1 时，定时器计数到 0 时会产生中断；置 0 则禁止中断。
+                        另外，有一个位用于指示定时器当前是否正在计数（COUNTFLAG 位），可以通过读取这个位来确定定时器是否已经完成了一次计数循环。
+                        位段16: COUNTFLAG ，R ，复位值0
+                        位段2：时钟源，CLKSOURCE，R/W，但实际是设置分频系数，0：8分频，1：1分频。
+                        段位1：TICKINT， R/W
+                    </p>
+            <h4 class="h3">（2）重载寄存器 STK_LOAD</h4>
+                <p>这个寄存器用于设置滴答定时器的初始计数值。因为定时器是 24 位的，所以可以设置的最大值为 。
+                    通过设置这个寄存器的值，可以确定定时器每次计数循环的时长。例如，根据所选的时钟源频率和想要实现的定时周期，计算出相应的初始值并写入这个寄存器。
+                </p>
+
+            <h4 class="h3">（3）当前值寄存器 STK_VAL</h4>
+                <p>可以读取当前定时器计数器的剩余值。不过需要注意的是，在某些情况下读取这个寄存器的值可能会受到限制或者需要特殊的操作顺序。
+                    例如，在一些芯片中，可能需要先暂停定时器（通过清除 ENABLE 位）才能准确读取当前值。
+                </p>
+       
+        </div>
+    </body>
+</html>
